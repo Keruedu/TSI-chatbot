@@ -1,3 +1,4 @@
+import calendar
 from datetime import date, datetime, timedelta
 from zoneinfo import ZoneInfo
 
@@ -54,28 +55,82 @@ def format_weekday(target_date: date) -> str:
     return WEEKDAY_NAMES[target_date.weekday()]
 
 
+def format_short_date(target_date: date) -> str:
+    return target_date.strftime("%d/%m")
+
+
+def wear_dates_for_month(year: int, month: int) -> list[date]:
+    _, days_in_month = calendar.monthrange(year, month)
+    wear_dates: list[date] = []
+
+    for day in range(1, days_in_month + 1):
+        candidate = date(year, month, day)
+        if is_wear_day(candidate):
+            wear_dates.append(candidate)
+
+    return wear_dates
+
+
 def build_wear_reminder_message(target_date: date) -> str:
-    return (
-        f"Nhắc lịch mặc áo: Hôm nay {format_date(target_date)} "
-        f"({format_weekday(target_date)}) là ngày mặc áo theo quy định."
+    return "\n".join(
+        [
+            "Nhắc lịch mặc áo",
+            (
+                f"Hôm nay {format_date(target_date)} ({format_weekday(target_date)}) "
+                "là ngày mặc áo theo quy định."
+            ),
+        ]
     )
 
 
 def build_today_status_message(target_date: date) -> str:
     if is_wear_day(target_date):
-        return (
-            f"Hôm nay {format_date(target_date)} ({format_weekday(target_date)}) "
-            "là ngày mặc áo."
+        return "\n".join(
+            [
+                "Hôm nay mặc áo",
+                f"Ngày: {format_date(target_date)} ({format_weekday(target_date)})",
+            ]
         )
 
     next_date = next_wear_date(target_date, include_today=False)
-    return (
-        f"Hôm nay {format_date(target_date)} ({format_weekday(target_date)}) "
-        "không phải ngày mặc áo. "
-        f"Ngày mặc tiếp theo là {format_date(next_date)} ({format_weekday(next_date)})."
+    return "\n".join(
+        [
+            "Hôm nay không phải ngày mặc áo",
+            f"Ngày: {format_date(target_date)} ({format_weekday(target_date)})",
+            f"Ngày mặc tiếp theo: {format_date(next_date)} ({format_weekday(next_date)})",
+        ]
     )
 
 
 def build_next_status_message(target_date: date) -> str:
     next_date = next_wear_date(target_date, include_today=True)
-    return f"Ngày mặc áo tiếp theo là {format_date(next_date)} ({format_weekday(next_date)})."
+    return "\n".join(
+        [
+            "Ngày mặc áo tiếp theo",
+            f"{format_date(next_date)} ({format_weekday(next_date)})",
+        ]
+    )
+
+
+def build_month_schedule_message(target_date: date) -> str:
+    wear_dates = wear_dates_for_month(target_date.year, target_date.month)
+    lines = [f"Lịch mặc áo tháng {target_date:%m/%Y}"]
+
+    if not wear_dates:
+        lines.append("- Không có ngày mặc áo trong tháng này.")
+    else:
+        lines.extend(
+            f"- {format_short_date(wear_date)} ({format_weekday(wear_date)})"
+            for wear_date in wear_dates
+        )
+
+    return "\n".join(lines)
+
+
+def build_test_message() -> str:
+    return "\n".join(
+        [
+            "Test bot thành công",
+            "Bot đã gửi được tin nhắn production.",
+        ]
+    )

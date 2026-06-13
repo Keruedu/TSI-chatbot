@@ -1,10 +1,13 @@
+import json
 from datetime import date
 
 from fastapi import FastAPI, Header, HTTPException, Query, Request
 
 from app.config import get_settings
 from app.schedule import (
+    build_month_schedule_message,
     build_next_status_message,
+    build_test_message,
     build_today_status_message,
     build_wear_reminder_message,
     is_wear_day,
@@ -25,6 +28,14 @@ def resolve_target_date(raw_date: str | None) -> date:
         return parse_iso_date(raw_date)
     except ValueError as exc:
         raise HTTPException(status_code=400, detail="date must use YYYY-MM-DD format") from exc
+
+
+def is_allowed_chat(chat_id: str | int | None, allowed_chat_id: str | None) -> bool:
+    if not allowed_chat_id:
+        return True
+    if chat_id is None:
+        return False
+    return str(chat_id) == str(allowed_chat_id)
 
 
 @app.get("/")
@@ -64,6 +75,20 @@ async def wear_reminder(
             if raw_date is None:
                 raise
 
+    print(
+        json.dumps(
+            {
+                "event": "wear_reminder_cron",
+                "localDate": target_date.isoformat(),
+                "isWearDay": wear_day,
+                "notificationSent": notification_sent,
+                "chatId": settings.telegram_chat_id,
+                "triggeredByTestDate": raw_date is not None,
+            },
+            ensure_ascii=False,
+        )
+    )
+
     return {
         "ok": True,
         "localDate": target_date.isoformat(),
@@ -89,12 +114,28 @@ async def telegram_webhook(
     command, chat_id = extract_command(update)
     target_date = today_vietnam()
 
+    if not is_allowed_chat(chat_id, settings.allowed_chat_id):
+        return {
+            "ok": True,
+            "handled": False,
+            "command": command,
+            "reason": "chat_not_allowed",
+        }
+
     if command == "/today":
         await send_message(settings.telegram_bot_token, chat_id, build_today_status_message(target_date))
         return {"ok": True, "handled": True, "command": command}
 
     if command == "/next":
         await send_message(settings.telegram_bot_token, chat_id, build_next_status_message(target_date))
+        return {"ok": True, "handled": True, "command": command}
+
+    if command == "/schedule":
+        await send_message(settings.telegram_bot_token, chat_id, build_month_schedule_message(target_date))
+        return {"ok": True, "handled": True, "command": command}
+
+    if command == "/test":
+        await send_message(settings.telegram_bot_token, chat_id, build_test_message())
         return {"ok": True, "handled": True, "command": command}
 
     return {"ok": True, "handled": False, "command": command}

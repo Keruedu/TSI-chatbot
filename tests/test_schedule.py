@@ -1,12 +1,15 @@
 from datetime import date
 
 from app.schedule import (
+    build_month_schedule_message,
     build_next_status_message,
+    build_test_message,
     build_today_status_message,
     build_wear_reminder_message,
     is_wear_day,
     next_wear_date,
     wear_date_for_week,
+    wear_dates_for_month,
 )
 
 
@@ -57,16 +60,46 @@ def test_next_wear_date_can_skip_today():
     assert next_wear_date(date(2026, 1, 7), include_today=False) == date(2026, 1, 16)
 
 
-def test_messages_use_vietnamese_accents():
+def test_wear_dates_for_month_matches_january_2026():
+    assert [wear_date.strftime("%d/%m") for wear_date in wear_dates_for_month(2026, 1)] == [
+        "07/01",
+        "16/01",
+        "20/01",
+        "29/01",
+    ]
+
+
+def test_messages_use_readable_vietnamese_formatting():
     assert (
         build_wear_reminder_message(date(2026, 1, 7))
-        == "Nhắc lịch mặc áo: Hôm nay 07/01/2026 (thứ 4) là ngày mặc áo theo quy định."
+        == "Nhắc lịch mặc áo\n"
+        "Hôm nay 07/01/2026 (thứ 4) là ngày mặc áo theo quy định."
+    )
+    assert build_today_status_message(date(2026, 1, 7)) == (
+        "Hôm nay mặc áo\n"
+        "Ngày: 07/01/2026 (thứ 4)"
     )
     assert build_today_status_message(date(2026, 1, 8)) == (
-        "Hôm nay 08/01/2026 (thứ 5) không phải ngày mặc áo. "
-        "Ngày mặc tiếp theo là 16/01/2026 (thứ 6)."
+        "Hôm nay không phải ngày mặc áo\n"
+        "Ngày: 08/01/2026 (thứ 5)\n"
+        "Ngày mặc tiếp theo: 16/01/2026 (thứ 6)"
     )
     assert (
         build_next_status_message(date(2026, 1, 8))
-        == "Ngày mặc áo tiếp theo là 16/01/2026 (thứ 6)."
+        == "Ngày mặc áo tiếp theo\n"
+        "16/01/2026 (thứ 6)"
+    )
+
+
+def test_schedule_and_test_messages_use_readable_vietnamese_formatting():
+    assert build_month_schedule_message(date(2026, 1, 8)) == (
+        "Lịch mặc áo tháng 01/2026\n"
+        "- 07/01 (thứ 4)\n"
+        "- 16/01 (thứ 6)\n"
+        "- 20/01 (thứ 3)\n"
+        "- 29/01 (thứ 5)"
+    )
+    assert build_test_message() == (
+        "Test bot thành công\n"
+        "Bot đã gửi được tin nhắn production."
     )

@@ -32,6 +32,7 @@ Optional local env file:
 ```text
 TELEGRAM_BOT_TOKEN=123:abc
 TELEGRAM_CHAT_ID=123456789
+ALLOWED_CHAT_ID=123456789
 CRON_SECRET=local-cron-secret
 TELEGRAM_WEBHOOK_SECRET=local-webhook-secret
 ```
@@ -51,8 +52,11 @@ With Telegram env vars set, the first command sends a real message because `2026
 
 - `TELEGRAM_BOT_TOKEN`
 - `TELEGRAM_CHAT_ID`
+- `ALLOWED_CHAT_ID`
 - `CRON_SECRET`
 - `TELEGRAM_WEBHOOK_SECRET`
+
+`ALLOWED_CHAT_ID` is optional but recommended. If it is missing, the bot falls back to `TELEGRAM_CHAT_ID` for webhook command authorization.
 
 ## Telegram webhook
 
@@ -66,3 +70,14 @@ Supported commands:
 
 - `/today`
 - `/next`
+- `/schedule`
+- `/test`
+
+Suggested BotFather command list:
+
+```text
+today - Kiểm tra hôm nay có phải ngày mặc áo không
+next - Xem ngày mặc áo tiếp theo
+schedule - Xem lịch mặc áo tháng hiện tại
+test - Gửi tin nhắn test production
+```

@@ -12,6 +12,7 @@ load_dotenv(".env.local")
 class Settings:
     telegram_bot_token: str | None
     telegram_chat_id: str | None
+    allowed_chat_id: str | None
     cron_secret: str | None
     telegram_webhook_secret: str | None
 
@@ -21,6 +22,7 @@ def get_settings() -> Settings:
     return Settings(
         telegram_bot_token=os.getenv("TELEGRAM_BOT_TOKEN"),
         telegram_chat_id=os.getenv("TELEGRAM_CHAT_ID"),
+        allowed_chat_id=os.getenv("ALLOWED_CHAT_ID") or os.getenv("TELEGRAM_CHAT_ID"),
         cron_secret=os.getenv("CRON_SECRET"),
         telegram_webhook_secret=os.getenv("TELEGRAM_WEBHOOK_SECRET"),
     )
