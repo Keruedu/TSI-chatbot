@@ -1,6 +1,13 @@
 from datetime import date
 
-from app.schedule import is_wear_day, next_wear_date, wear_date_for_week
+from app.schedule import (
+    build_next_status_message,
+    build_today_status_message,
+    build_wear_reminder_message,
+    is_wear_day,
+    next_wear_date,
+    wear_date_for_week,
+)
 
 
 EXPECTED_2026 = {
@@ -48,3 +55,18 @@ def test_next_wear_date_can_include_today():
 
 def test_next_wear_date_can_skip_today():
     assert next_wear_date(date(2026, 1, 7), include_today=False) == date(2026, 1, 16)
+
+
+def test_messages_use_vietnamese_accents():
+    assert (
+        build_wear_reminder_message(date(2026, 1, 7))
+        == "Nhắc lịch mặc áo: Hôm nay 07/01/2026 (thứ 4) là ngày mặc áo theo quy định."
+    )
+    assert build_today_status_message(date(2026, 1, 8)) == (
+        "Hôm nay 08/01/2026 (thứ 5) không phải ngày mặc áo. "
+        "Ngày mặc tiếp theo là 16/01/2026 (thứ 6)."
+    )
+    assert (
+        build_next_status_message(date(2026, 1, 8))
+        == "Ngày mặc áo tiếp theo là 16/01/2026 (thứ 6)."
+    )

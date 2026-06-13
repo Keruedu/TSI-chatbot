@@ -4,13 +4,13 @@ from zoneinfo import ZoneInfo
 
 VN_TIMEZONE = ZoneInfo("Asia/Ho_Chi_Minh")
 WEEKDAY_NAMES = {
-    0: "thu 2",
-    1: "thu 3",
-    2: "thu 4",
-    3: "thu 5",
-    4: "thu 6",
-    5: "thu 7",
-    6: "chu nhat",
+    0: "thứ 2",
+    1: "thứ 3",
+    2: "thứ 4",
+    3: "thứ 5",
+    4: "thứ 6",
+    5: "thứ 7",
+    6: "chủ nhật",
 }
 
 
@@ -56,26 +56,26 @@ def format_weekday(target_date: date) -> str:
 
 def build_wear_reminder_message(target_date: date) -> str:
     return (
-        f"Nhac lich mac ao: Hom nay {format_date(target_date)} "
-        f"({format_weekday(target_date)}) la ngay mac ao theo quy dinh."
+        f"Nhắc lịch mặc áo: Hôm nay {format_date(target_date)} "
+        f"({format_weekday(target_date)}) là ngày mặc áo theo quy định."
     )
 
 
 def build_today_status_message(target_date: date) -> str:
     if is_wear_day(target_date):
         return (
-            f"Hom nay {format_date(target_date)} ({format_weekday(target_date)}) "
-            "la ngay mac ao."
+            f"Hôm nay {format_date(target_date)} ({format_weekday(target_date)}) "
+            "là ngày mặc áo."
         )
 
     next_date = next_wear_date(target_date, include_today=False)
     return (
-        f"Hom nay {format_date(target_date)} ({format_weekday(target_date)}) "
-        "khong phai ngay mac ao. "
-        f"Ngay mac tiep theo la {format_date(next_date)} ({format_weekday(next_date)})."
+        f"Hôm nay {format_date(target_date)} ({format_weekday(target_date)}) "
+        "không phải ngày mặc áo. "
+        f"Ngày mặc tiếp theo là {format_date(next_date)} ({format_weekday(next_date)})."
     )
 
 
 def build_next_status_message(target_date: date) -> str:
     next_date = next_wear_date(target_date, include_today=True)
-    return f"Ngay mac ao tiep theo la {format_date(next_date)} ({format_weekday(next_date)})."
+    return f"Ngày mặc áo tiếp theo là {format_date(next_date)} ({format_weekday(next_date)})."

@@ -1,6 +1,6 @@
 # Telegram Wear Reminder Bot
 
-FastAPI bot for Vercel that reminds a Telegram group on official wear-shirt days at 00:00 and 08:00 Vietnam time.
+FastAPI bot for Vercel that reminds a Telegram chat on official wear-shirt days at 00:00 and 08:00 Vietnam time.
 
 ## Formula
 
@@ -31,7 +31,7 @@ Optional local env file:
 
 ```text
 TELEGRAM_BOT_TOKEN=123:abc
-TELEGRAM_CHAT_ID=-1001234567890
+TELEGRAM_CHAT_ID=123456789
 CRON_SECRET=local-cron-secret
 TELEGRAM_WEBHOOK_SECRET=local-webhook-secret
 ```
@@ -45,7 +45,7 @@ curl.exe -H "Authorization: Bearer local-cron-secret" "http://127.0.0.1:8000/api
 curl.exe -H "Authorization: Bearer local-cron-secret" "http://127.0.0.1:8000/api/cron/wear-reminder?date=2026-01-08"
 ```
 
-With Telegram env vars set, the first command sends a real group message because `2026-01-07` is a wear day. The second returns `notificationSent=false`.
+With Telegram env vars set, the first command sends a real message because `2026-01-07` is a wear day. The second returns `notificationSent=false`.
 
 ## Vercel env vars
 
