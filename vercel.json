@@ -1,0 +1,18 @@
+{
+  "rewrites": [
+    {
+      "source": "/api/(.*)",
+      "destination": "/api/index"
+    }
+  ],
+  "crons": [
+    {
+      "path": "/api/cron/wear-reminder",
+      "schedule": "0 17 * * *"
+    },
+    {
+      "path": "/api/cron/wear-reminder",
+      "schedule": "0 1 * * *"
+    }
+  ]
+}
